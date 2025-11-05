@@ -1,9 +1,14 @@
 package com.verduleria.backend.entity;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class ProductoLista extends Producto {
   private Producto producto;
   private int cantidad;
   private double precioTotal;
+
+  public ProductoLista(){}
 
   public ProductoLista(Producto producto, int cantidad) {
     this.producto = producto;

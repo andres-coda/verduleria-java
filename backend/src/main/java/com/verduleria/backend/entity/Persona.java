@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
+@MappedSuperclass
 public abstract class Persona {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,6 +16,8 @@ public abstract class Persona {
     private String email;
     private String telefono;
     private ArrayList<Producto> productos;
+
+    protected Persona(){}
 
     protected Persona(String nombre, String email, String telefono) {
         this.nombre = nombre;

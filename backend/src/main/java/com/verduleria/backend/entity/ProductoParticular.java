@@ -1,10 +1,19 @@
 package com.verduleria.backend.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class ProductoParticular extends ProductoGeneral {
   private Usuario usuario;
   private double precio;
   private String medida;
   private double porcentajeAumento;
+
+  
+    public ProductoParticular() {}
 
   public ProductoParticular(String nombre, Rubro rubro, Usuario usuario, double precio, String medida, double porcentaje) {
     super(nombre, rubro);

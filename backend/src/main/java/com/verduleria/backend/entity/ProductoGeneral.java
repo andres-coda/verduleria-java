@@ -1,8 +1,13 @@
 package com.verduleria.backend.entity;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class ProductoGeneral extends Producto{
   private String nombre;
   private Rubro rubro;
+
+  public ProductoGeneral(){}
 
     public ProductoGeneral(String nombre, Rubro rubro){
         super();

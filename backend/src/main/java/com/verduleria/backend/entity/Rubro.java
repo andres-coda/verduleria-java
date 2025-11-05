@@ -1,16 +1,19 @@
 package com.verduleria.backend.entity;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-
+@Entity
 public class Rubro {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private String nombre;
 
+  public Rubro(){}
+  
   protected Rubro(String nombre){
     this.nombre = nombre;
   }

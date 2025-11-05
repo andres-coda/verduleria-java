@@ -3,11 +3,15 @@ package com.verduleria.backend.entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
+@MappedSuperclass
 public abstract class Producto {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  protected Producto(){}
 
   public Long getId() {
     return id;
@@ -15,6 +19,6 @@ public abstract class Producto {
 
   abstract public double getPrecio();
   public double getPorcentajeAumento(){
-    return 1;
+    return 0;
   };
 }

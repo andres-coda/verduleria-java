@@ -1,12 +1,17 @@
 package com.verduleria.backend.entity;
 
 import java.util.ArrayList;
+
+import jakarta.persistence.Entity;
+
+@Entity
 public class Usuario extends Persona{
   private String password;
   private ArrayList<Rubro> rubros;
   private ArrayList<Proveedor> proveedores;
   private ArrayList<Lista> listas;
 
+  public Usuario(){}
   
   public Usuario(String nombre, String email, String telefono, String password) {
     super(nombre, email, telefono);
