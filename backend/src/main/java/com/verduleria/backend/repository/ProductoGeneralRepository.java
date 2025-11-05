@@ -13,4 +13,6 @@ public interface ProductoGeneralRepository extends JpaRepository<ProductoGeneral
   List<ProductoGeneral> findByRubro(Rubro rubro);
 
   List<ProductoGeneral> findByNombre(String nombre);
+
+  boolean existsByNombre(String nombre);
 }
