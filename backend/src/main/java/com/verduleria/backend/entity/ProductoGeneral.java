@@ -1,20 +1,24 @@
 package com.verduleria.backend.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
-public class ProductoGeneral extends Producto{
+public class ProductoGeneral extends Producto {
   private String nombre;
+  @ManyToOne
+  @JoinColumn(name = "rubro_id")
   private Rubro rubro;
 
-  public ProductoGeneral(){}
+  public ProductoGeneral() {
+  }
 
-    public ProductoGeneral(String nombre, Rubro rubro){
-        super();
-        this.nombre = nombre;
-        this.rubro = rubro;
-    }
-    
+  public ProductoGeneral(String nombre, Rubro rubro) {
+    super();
+    this.nombre = nombre;
+    this.rubro = rubro;
+  }
 
   public String getNombre() {
     return nombre;
@@ -32,7 +36,7 @@ public class ProductoGeneral extends Producto{
     this.rubro = rubro;
   }
 
-  public double getPrecio(){
+  public double getPrecio() {
     return 0;
   }
 }

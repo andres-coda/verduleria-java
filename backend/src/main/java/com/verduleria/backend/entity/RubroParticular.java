@@ -1,10 +1,13 @@
 package com.verduleria.backend.entity;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+
 @Entity
+@DiscriminatorValue("PARTICULAR")
 public class RubroParticular extends Rubro {
   @ManyToOne
   @JoinColumn(name = "usuario_id")

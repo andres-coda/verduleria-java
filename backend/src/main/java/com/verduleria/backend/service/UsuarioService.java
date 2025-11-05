@@ -1,47 +1,61 @@
 package com.verduleria.backend.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.verduleria.backend.entity.Usuario;
 import com.verduleria.backend.repository.UsuarioRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
-public class UsuarioService {
-    
-    private final UsuarioRepository usuarioRepository;
+public class UsuarioService implements UserDetailsService {
+  
+  private final UsuarioRepository usuarioRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+  public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    this.usuarioRepository = usuarioRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
+  
+  @Override
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    return usuarioRepository.findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+  }
+  
+  public List<Usuario> getAllUsuarios() {
+    return usuarioRepository.findAll();
+  }
+  
+  public Usuario getUsuarioById(Long id) {
+    return usuarioRepository.findById(id).orElse(null);
+  }
+  
+  public Usuario createUsuario(Usuario usuario) {
+    // Encriptar password antes de guardar
+    usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+    return usuarioRepository.save(usuario);
+  }
+  
+  public Usuario updateUsuario(Long id, Usuario usuario) {
+    Usuario existente = usuarioRepository.findById(id).orElse(null);
+    if (existente != null) {
+      existente.setNombre(usuario.getNombre());
+      existente.setEmail(usuario.getEmail());
+      existente.setTelefono(usuario.getTelefono());
+      if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+        existente.setPassword(passwordEncoder.encode(usuario.getPassword()));
+      }
+      return usuarioRepository.save(existente);
     }
-
-    public List<Usuario> getAllUsuarios() {
-        return usuarioRepository.findAll();
-    }
-
-    public Usuario getUsuarioById(Long id) {
-        return usuarioRepository.findById(id).orElse(null);
-    }
-
-    public Usuario createUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
-    }
-
-    public Usuario updateUsuario(Long id, Usuario usuarioActualizado) {
-        return usuarioRepository.findById(id)
-            .map(usuario -> {
-                usuario.setNombre(usuarioActualizado.getNombre());
-                usuario.setEmail(usuarioActualizado.getEmail());
-                usuario.setTelefono(usuarioActualizado.getTelefono());
-                usuario.setPassword(usuarioActualizado.getPassword());
-                return usuarioRepository.save(usuario);
-            })
-            .orElse(null);
-    }
-
-    public void deleteUsuario(Long id) {
-        usuarioRepository.deleteById(id);
-    }
+    return null;
+  }
+  
+  public void deleteUsuario(Long id) {
+    usuarioRepository.deleteById(id);
+  }
 }
-

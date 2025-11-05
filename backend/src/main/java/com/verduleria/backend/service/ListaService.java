@@ -78,11 +78,11 @@ public class ListaService {
 
   // Buscar listas por proveedor
   public List<Lista> getListasByProveedor(Long proveedorId, Long usuarioId) {
-    return listaRepository.findByUsuarioAndProveedor(proveedorId, usuarioId);
+    return listaRepository.findByUsuarioIdAndProveedorId(proveedorId, usuarioId);
   }
 
   // Buscar listas por fecha
   public List<Lista> getListasByFecha(LocalDate fecha, Long usuarioId) {
-    return listaRepository.findByUsuarioAndFecha(usuarioId, fecha);
+    return listaRepository.findByUsuarioIdAndFecha(usuarioId, fecha);
   }
 }

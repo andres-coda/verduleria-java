@@ -1,32 +1,74 @@
 package com.verduleria.backend.entity;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class Usuario extends Persona {
+public class Usuario extends Persona implements UserDetails {
+  @Column(unique = true)
+  private String email;
   private String password;
   @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<RubroParticular> rubrosParticulares = new ArrayList<RubroParticular>();
   @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Proveedor> proveedores = new ArrayList<Proveedor>();
-  private ArrayList<Lista> listas;
+  @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ProductoParticular> productos = new ArrayList<ProductoParticular>();
+  @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Lista> listas = new ArrayList<Lista>();
 
   public Usuario() {
   }
 
   public Usuario(String nombre, String email, String telefono, String password) {
-    super(nombre, email, telefono);
+    super(nombre, telefono);
+    this.email = email;
     this.password = password;
-    this.listas = new ArrayList<Lista>();
   }
 
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String getUsername() {
+    return email;
+  }
+
+  @Override
   public String getPassword() {
     return password;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
   }
 
   public void setPassword(String password) {
@@ -59,8 +101,8 @@ public class Usuario extends Persona {
     this.proveedores.removeIf(p -> p.getId().equals(proveedor.getId()));
   }
 
-  public ArrayList<Lista> getListas() {
-    ArrayList<Lista> aux = this.listas;
+  public List<Lista> getListas() {
+    List<Lista> aux = this.listas;
     return aux;
   }
 
@@ -70,6 +112,27 @@ public class Usuario extends Persona {
 
   public void quitarLista(Lista lista) {
     this.listas.removeIf(l -> l.getId().equals(lista.getId()));
+  }
+
+  public List<ProductoParticular> getProductos() {
+    List<ProductoParticular> nuevoProducto = this.productos;
+    return nuevoProducto;
+  }
+
+  public void addProducto(ProductoParticular producto) {
+    this.productos.add(producto);
+  }
+
+  public void quitarProducto(ProductoParticular producto) {
+    productos.removeIf(p -> p.getId().equals(producto.getId()));
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
   }
 
 }

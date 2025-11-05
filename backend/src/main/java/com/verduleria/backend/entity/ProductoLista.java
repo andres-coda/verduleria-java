@@ -1,9 +1,13 @@
 package com.verduleria.backend.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class ProductoLista extends Producto {
+  @ManyToOne
+  @JoinColumn(name = "producto_id")
   private Producto producto;
   private int cantidad;
   private double precioTotal;
@@ -43,7 +47,4 @@ public class ProductoLista extends Producto {
   public double getPrecioTotal() {
     return precioTotal;
   }
-
-  
-
 }

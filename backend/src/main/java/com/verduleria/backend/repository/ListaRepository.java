@@ -15,7 +15,7 @@ public interface ListaRepository extends JpaRepository<Lista, Long> {
 
     List<Lista> findByUsuarioId(Long usuarioId);
 
-    List<Lista> findByUsuarioAndProveedor(Long usuarioId, Long proveedorId);
+    List<Lista> findByUsuarioIdAndProveedorId(Long usuarioId, Long proveedorId);
 
-    List<Lista> findByUsuarioAndFecha(Long usuarioId, LocalDate fecha);
+    List<Lista> findByUsuarioIdAndFecha(Long usuarioId, LocalDate fecha);
 }

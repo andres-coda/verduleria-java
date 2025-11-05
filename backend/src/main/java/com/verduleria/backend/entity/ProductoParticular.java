@@ -13,6 +13,10 @@ public class ProductoParticular extends ProductoGeneral {
   @JoinColumn(name = "usuario_id")
   private Usuario usuario;
 
+  @ManyToOne
+  @JoinColumn(name = "proveedor_id")
+  private Proveedor proveedor;
+
   private double precio;
   private String medida;
   private double porcentajeAumento;
