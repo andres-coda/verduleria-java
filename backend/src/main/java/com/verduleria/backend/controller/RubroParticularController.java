@@ -1,7 +1,12 @@
 package com.verduleria.backend.controller;
 
+import com.verduleria.backend.dto.RubroParticularDto;
 import com.verduleria.backend.entity.RubroParticular;
+import com.verduleria.backend.entity.Usuario;
 import com.verduleria.backend.service.RubroParticularService;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +21,20 @@ public class RubroParticularController {
     this.rubroParticularService = rubroParticularService;
   }
 
+  @PostMapping
+  public ResponseEntity<RubroParticularDto> createRubroParticular(
+      @RequestBody RubroParticular rubro,
+      @AuthenticationPrincipal Usuario usuario) { 
+    
+    rubro.setUsuario(usuario);
+    RubroParticular nuevoRubro = rubroParticularService.createRubroParticular(rubro);
+    RubroParticularDto dto = new RubroParticularDto(
+      nuevoRubro.getId(),
+      nuevoRubro.getNombre()
+  );
+    return ResponseEntity.ok(dto);
+  }
+
   @GetMapping
   public List<RubroParticular> getAllRubrosParticulares() {
     return rubroParticularService.getAllRubrosParticulares();
@@ -24,11 +43,6 @@ public class RubroParticularController {
   @GetMapping("/{id}")
   public RubroParticular getRubroParticularById(@PathVariable Long id) {
     return rubroParticularService.getRubroParticularById(id);
-  }
-
-  @PostMapping
-  public RubroParticular createRubroParticular(@RequestBody RubroParticular rubroParticular) {
-    return rubroParticularService.createRubroParticular(rubroParticular);
   }
 
   @PutMapping("/{id}")

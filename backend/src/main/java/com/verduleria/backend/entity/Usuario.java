@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,12 +21,16 @@ public class Usuario extends Persona implements UserDetails {
   private String email;
   private String password;
   @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
   private List<RubroParticular> rubrosParticulares = new ArrayList<RubroParticular>();
   @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
   private List<Proveedor> proveedores = new ArrayList<Proveedor>();
   @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
   private List<ProductoParticular> productos = new ArrayList<ProductoParticular>();
   @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
   private List<Lista> listas = new ArrayList<Lista>();
 
   public Usuario() {

@@ -18,9 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import org.springframework.web.cors.CorsConfiguration; 
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource; 
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.cors.CorsConfiguration; // <-- IMPORTAR
+import org.springframework.web.cors.CorsConfigurationSource; // <-- IMPORTAR
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // <-- IMPORTAR
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -32,23 +33,9 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
 
     @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        
-        config.setAllowCredentials(true); 
-        config.addAllowedOrigin("*"); // Reemplazar con el origen de tu frontend en producción (ej: http://localhost:3000)
-        config.addAllowedHeader("*"); // Permite cualquier encabezado
-        config.addAllowedMethod("*"); // Permite GET, POST, PUT, DELETE, etc.
-        
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.disable())
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
@@ -58,10 +45,25 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider()) // aquí inyectamos el provider
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // ¡IMPORTANTE! Reemplaza "http://localhost:3000" con el dominio de tu frontend
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); 
+        
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*")); // Permite todos los encabezados
+        configuration.setAllowCredentials(true); // Permite el uso de cookies/autenticación
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Aplica a todas las rutas
+        return source;
     }
 
     @Bean
