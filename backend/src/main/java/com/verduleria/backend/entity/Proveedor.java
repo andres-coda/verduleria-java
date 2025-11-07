@@ -3,6 +3,8 @@ package com.verduleria.backend.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -12,19 +14,22 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class Proveedor extends Persona {
   private String email;
+  
   @ManyToOne
   @JoinColumn(name = "usuario_id")
+  @JsonIgnore  // ✅ Evita loops infinitos
   private Usuario usuario;
+  
   @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore  // ✅ Evita loops infinitos
   private List<ProductoParticular> productos = new ArrayList<ProductoParticular>();
 
   public Proveedor() {
   }
 
-  public Proveedor(String nombre, String email, String telefono, Usuario usuario) {
+  public Proveedor(String nombre, String email, String telefono) {
     super(nombre, telefono);
     this.email = email;
-    this.usuario = usuario;
   }
 
   public Usuario getUsuario() {
@@ -32,8 +37,7 @@ public class Proveedor extends Persona {
   }
 
   public List<ProductoParticular> getProductos() {
-    List<ProductoParticular> nuevoProducto = this.productos;
-    return nuevoProducto;
+    return new ArrayList<>(this.productos);
   }
 
   public void addProducto(ProductoParticular producto) {
@@ -52,4 +56,7 @@ public class Proveedor extends Persona {
     this.email = email;
   }
 
+  public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
+  }
 }
