@@ -1,7 +1,11 @@
 package com.verduleria.backend.controller;
 
+import com.verduleria.backend.dto.CreateProveedorRequest;
+import com.verduleria.backend.dto.ProductoDto;
 import com.verduleria.backend.dto.ProveedorDto;
+import com.verduleria.backend.dto.ProveedorSimpleDto;
 import com.verduleria.backend.entity.Proveedor;
+import com.verduleria.backend.entity.ProductoParticular;
 import com.verduleria.backend.entity.Usuario;
 import com.verduleria.backend.exception.ValidationException;
 import com.verduleria.backend.service.ProveedorService;
@@ -30,11 +34,11 @@ public class ProveedorController {
     
     List<Proveedor> proveedores = proveedorService.getProveedoresByUsuario(usuario.getId());
     
-    List<ProveedorDto> proveedoresDTO = proveedores.stream()
-        .map(this::convertToDTO)
+    List<ProveedorDto> proveedoresDto = proveedores.stream()
+        .map(this::convertToDto)
         .collect(Collectors.toList());
     
-    return ResponseEntity.ok(proveedoresDTO);
+    return ResponseEntity.ok(proveedoresDto);
   }
 
   // Obtener un proveedor específico
@@ -44,38 +48,62 @@ public class ProveedorController {
       @AuthenticationPrincipal Usuario usuario) {
     
     Proveedor proveedor = proveedorService.getProveedorByIdAndUsuario(id, usuario.getId());
-    return ResponseEntity.ok(convertToDTO(proveedor));
+    return ResponseEntity.ok(convertToDto(proveedor));
   }
 
-  // Crear nuevo proveedor
+  // Crear nuevo proveedor con productos
   @PostMapping
   public ResponseEntity<ProveedorDto> createProveedor(
-      @RequestBody Proveedor proveedor,
+      @RequestBody CreateProveedorRequest request,
       @AuthenticationPrincipal Usuario usuario) {
     
     // Validar datos
-    validateProveedor(proveedor);
+    validateProveedorRequest(request);
     
-    // Asignar usuario automáticamente
+    // Crear entidad proveedor
+    Proveedor proveedor = new Proveedor(
+        request.getNombre(),
+        request.getEmail(),
+        request.getTelefono()
+    );
     proveedor.setUsuario(usuario);
     
-    Proveedor nuevoProveedor = proveedorService.createProveedor(proveedor);
-    return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(nuevoProveedor));
+    // Crear proveedor con productos
+    Proveedor nuevoProveedor = proveedorService.createProveedorConProductos(
+        proveedor, 
+        request.getProductos(), 
+        usuario.getId()
+    );
+    
+    return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(nuevoProveedor));
   }
 
-  // Actualizar proveedor
+  // Actualizar proveedor con productos
   @PutMapping("/{id}")
   public ResponseEntity<ProveedorDto> updateProveedor(
       @PathVariable Long id,
-      @RequestBody Proveedor proveedor,
+      @RequestBody CreateProveedorRequest request,
       @AuthenticationPrincipal Usuario usuario) {
     
     // Validar datos
-    validateProveedor(proveedor);
+    validateProveedorRequest(request);
     
-    // Actualizar manteniendo el usuario
-    Proveedor proveedorActualizado = proveedorService.updateProveedor(id, proveedor, usuario.getId());
-    return ResponseEntity.ok(convertToDTO(proveedorActualizado));
+    // Crear entidad proveedor con datos actualizados
+    Proveedor proveedor = new Proveedor(
+        request.getNombre(),
+        request.getEmail(),
+        request.getTelefono()
+    );
+    
+    // Actualizar proveedor con productos
+    Proveedor proveedorActualizado = proveedorService.updateProveedorConProductos(
+        id, 
+        proveedor, 
+        request.getProductos(), 
+        usuario.getId()
+    );
+    
+    return ResponseEntity.ok(convertToDto(proveedorActualizado));
   }
 
   // Eliminar proveedor
@@ -88,30 +116,53 @@ public class ProveedorController {
     return ResponseEntity.noContent().build();
   }
 
-  // Convertir entidad a DTO
-  private ProveedorDto convertToDTO(Proveedor proveedor) {
+  // Convertir entidad a Dto
+  private ProveedorDto convertToDto(Proveedor proveedor) {
+    List<ProductoDto> productosDto = proveedor.getProductos().stream()
+        .map(this::convertProductoToDto)
+        .collect(Collectors.toList());
+    
     return new ProveedorDto(
         proveedor.getId(),
         proveedor.getNombre(),
         proveedor.getEmail(),
         proveedor.getTelefono(),
-        proveedor.getUsuario().getId()
+        proveedor.getUsuario().getId(),
+        productosDto
     );
   }
 
+  // Mantener todo igual, solo actualizar este método:
+
+private ProductoDto convertProductoToDto(ProductoParticular producto) {
+    List<ProveedorSimpleDto> proveedoresDto = producto.getProveedores().stream()
+        .map(p -> new ProveedorSimpleDto(p.getId(), p.getNombre(), p.getTelefono(), p.getEmail()))
+        .collect(Collectors.toList());
+    
+    return new ProductoDto(
+        producto.getId(),
+        producto.getNombre(),
+        producto.getPrecio(),
+        producto.getMedida(),
+        producto.getPorcentajeAumento(),
+        producto.getRubro().getId(),
+        producto.getRubro().getNombre(),
+        proveedoresDto
+    );
+}
   // Validar proveedor
-  private void validateProveedor(Proveedor proveedor) {
-    if (proveedor.getNombre() == null || proveedor.getNombre().trim().isEmpty()) {
+  private void validateProveedorRequest(CreateProveedorRequest request) {
+    if (request.getNombre() == null || request.getNombre().trim().isEmpty()) {
       throw new ValidationException("El nombre del proveedor es obligatorio");
     }
 
-    if (proveedor.getEmail() != null && !proveedor.getEmail().trim().isEmpty()) {
-      if (!isValidEmail(proveedor.getEmail())) {
+    if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+      if (!isValidEmail(request.getEmail())) {
         throw new ValidationException("El formato del email no es válido");
       }
     }
 
-    if (proveedor.getTelefono() == null || proveedor.getTelefono().trim().isEmpty()) {
+    if (request.getTelefono() == null || request.getTelefono().trim().isEmpty()) {
       throw new ValidationException("El teléfono es obligatorio");
     }
   }

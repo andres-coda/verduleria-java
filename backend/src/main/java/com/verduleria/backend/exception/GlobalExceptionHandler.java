@@ -134,6 +134,21 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
   }
 
+  // Productos
+  @ExceptionHandler(ProductoNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleProductoNotFound(
+      ProductoNotFoundException ex,
+      HttpServletRequest request) {
+
+    ErrorResponse error = new ErrorResponse(
+        HttpStatus.NOT_FOUND.value(),
+        "Not Found",
+        ex.getMessage(),
+        request.getRequestURI());
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+  }
+
   // Error genérico
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGenericException(

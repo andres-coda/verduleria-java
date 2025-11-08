@@ -20,4 +20,6 @@ public interface ProductoParticularRepository extends JpaRepository<ProductoPart
     ProductoParticular findByNombreAndUsuario(String nombre, Usuario usuario);
 
     boolean existsByNombreAndUsuario(String nombre, Usuario usuario);
+    
+    List<ProductoParticular> findByProveedoresId(Long proveedorId);
 }
